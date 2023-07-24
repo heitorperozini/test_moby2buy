@@ -21,16 +21,19 @@ variable "private_subnets" {
 
 variable "bucket_arn" {
   description = "Bucket ARN"
+  type        = string
 }
 
 variable "bastion_sg" {
   description = "Bastion Security Group"
+  type        = string
   default     = ""
 }
 
 variable "subnets_id" {
   description = "Subnets Id"
-  default     = ""
+  type        = list(string)
+  default     = []
 }
 
 variable "key_pair" {

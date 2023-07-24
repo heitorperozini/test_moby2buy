@@ -1,15 +1,6 @@
 ################################################################################
 # EC2
-################################################################################
-data "aws_ami" "amazon_linux_2" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm-x86_64-gp2"]
-  }
-}
+###############################################################################
 resource "aws_instance" "web" {
   ami           = "data.aws_ami.amazon_linux_2.id"
   instance_type = "${var.ec2_instance_type}"
@@ -169,7 +160,7 @@ output "iam_role_arn" {
 
 resource "aws_lb" "load_balancer" {
   name               = "AppLoadBalancer"
-  subnets            = element(var.subnets_id, count.index)
+  subnets            = var.subnets_id
   security_groups    = [aws_security_group.load_balancer.id]
 
     tags = merge(

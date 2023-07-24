@@ -20,7 +20,7 @@ module "vpc" {
 
 module "s3" {
   source          = "./modules/s3"
-  s3_bucket_name  = "Test-bucket"
+  s3_bucket_name  = "test-bucket-heitor-perozini"
 }
 
 module "ec2_bastion" {

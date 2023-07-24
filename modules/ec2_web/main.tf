@@ -156,7 +156,7 @@ resource "aws_iam_policy" "ecr_policy" {
 
 resource "aws_iam_role_policy_attachment" "ecr_policy_attachment" {
   policy_arn = aws_iam_policy.ecr_policy.arn
-  role       = aws_iam_role.app_role.name
+  role       = aws_iam_role.app_role.id
 }
 
 output "iam_role_arn" {

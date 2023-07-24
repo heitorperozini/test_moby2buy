@@ -41,6 +41,7 @@ module "ec2_web" {
   private_subnets      = module.vpc.private_subnet_ids
   bastion_sg           = module.ec2_bastion.bastion_sg
   bucket_arn           = module.s3.bucket_arn
+  subnets_id           = module.vpc.public_subnet_ids
   key_pair             = module.ec2_bastion.keypair
   tags                 = local.tags
 

@@ -28,6 +28,11 @@ variable "bastion_sg" {
   default     = ""
 }
 
+variable "subnets_id" {
+  description = "Subnets Id"
+  default     = ""
+}
+
 variable "key_pair" {
   description = "Key pair name"
   default     = ""

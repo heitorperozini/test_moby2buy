@@ -13,10 +13,11 @@ data "aws_ami" "amazon_linux_2" {
 }
 
 resource "aws_instance" "bastion" {
-  ami           = data.aws_ami.amazon_linux_2.id
-  instance_type = "${var.ec2_instance_type}"
-  subnet_id     = element(var.public_subnets, 0)
-  key_name      = aws_key_pair.keypair.id
+  ami                         = data.aws_ami.amazon_linux_2.id
+  instance_type               = "${var.ec2_instance_type}"
+  subnet_id                   = element(var.public_subnets, 0)
+  key_name                    = aws_key_pair.keypair.id
+  associate_public_ip_address = true
 
   root_block_device {
     volume_size = 8

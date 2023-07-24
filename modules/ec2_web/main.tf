@@ -25,7 +25,7 @@ resource "aws_instance" "web" {
 
   vpc_security_group_ids = [aws_security_group.web.id]
 
-  iam_instance_profile = aws_iam_role.app_role.name
+  iam_instance_profile = aws_iam_instance_profile.web_profile.name
 
     tags = merge(
     { "Name" = "${var.name}-web-server" },

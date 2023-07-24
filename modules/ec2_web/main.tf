@@ -169,7 +169,7 @@ output "iam_role_arn" {
 
 resource "aws_lb" "load_balancer" {
   name               = "AppLoadBalancer"
-  subnets            = var.public_subnets
+  subnets            = element(aws_subnet.public[*].id, 0)
   security_groups    = [aws_security_group.load_balancer.id]
 
     tags = merge(

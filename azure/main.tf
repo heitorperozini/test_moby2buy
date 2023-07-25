@@ -75,7 +75,7 @@ resource "azurerm_linux_virtual_machine" "bastion_vm" {
   source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22.04-LTS"
+    sku       = "22_04-LTS"
     version   = "latest"
   }
 }
@@ -165,7 +165,7 @@ resource "azurerm_linux_virtual_machine" "nginx_vm" {
   source_image_reference {
     publisher = "Canonical"
     offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22.04-LTS"
+    sku       = "22_04-LTS"
     version   = "latest"
   }
 }

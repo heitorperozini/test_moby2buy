@@ -1,6 +1,6 @@
 variable "location" {
   description = "Location"
-  default     = "us-east-1"
+  default     = "eastus"
 }
 
 variable "vnet_name" {

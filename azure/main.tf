@@ -124,6 +124,29 @@ resource "azurerm_network_security_group" "nsg" {
     source_address_prefix      = "*"
     destination_address_prefix = "*"
   }
+    security_rule {
+    name                       = "HTTP"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "80"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
+
+    security_rule {
+    name                       = "HTTPS"
+    priority                   = 1001
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "443"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+  }
 }
 
 resource "azurerm_ssh_public_key" "bastion" {
@@ -146,12 +169,12 @@ resource "tls_private_key" "nginx" {
 }
 resource "azurerm_linux_virtual_machine" "nginx_vm" {
   name                  = "nginx-vm"
-  location            = azurerm_resource_group.test.location
-  resource_group_name = azurerm_resource_group.test.name
+  location              = azurerm_resource_group.test.location
+  resource_group_name   = azurerm_resource_group.test.name
   size                  = "Standard_DS2_v2"
   admin_username        = "azureuser"
   network_interface_ids = [azurerm_network_interface.nginx_nic.id]
-    custom_data = base64encode(data.template_file.nginx-vm-cloud-init.rendered)
+  custom_data           = base64encode(data.template_file.nginx-vm-cloud-init.rendered)
 
   admin_ssh_key {
    username = "azureuser"

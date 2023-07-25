@@ -42,7 +42,7 @@ jobs:
     - name: Get EC2 Instance IPs
       id: get-ec2-ips
       run: |
-          APP_HOST=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=Test-web-server" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+          APP_HOST=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=Test-web-server" --query 'Reservations[*].Instances[*].PrivateIpAddress' --output text)
           BASTION_HOST=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=Test-bastion-server" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
           echo "APP_HOST=${APP_HOST}" >> $GITHUB_ENV
           echo "BASTION_HOST=${BASTION_HOST}" >> $GITHUB_ENV

@@ -63,7 +63,7 @@ jobs:
       with:
         host: ${{ env.BASTION_HOST }}
         username: ec2-user
-        key: ${{ emv.PRIVATE_KEY }}
+        key: ${{ env.PRIVATE_KEY }}
         envs: EC2_HOST, EC2_USER, PEM_PATH, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
        
         script: |

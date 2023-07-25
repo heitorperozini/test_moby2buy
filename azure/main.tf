@@ -49,7 +49,10 @@ resource "azurerm_subnet" "app" {
 ################################################################################
 # BASTION VM
 ###############################################################################
-
+resource "tls_private_key" "bastion" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
 
 resource "azurerm_linux_virtual_machine" "bastion_vm" {
   name                  = "bastion-vm"
@@ -127,7 +130,7 @@ resource "azurerm_ssh_public_key" "bastion" {
   name                = "bastion_key"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
-  generate_key        = true
+  public_key          = tls_private_key.bastion.public_key_openssh
 }
 
 ################################################################################
@@ -135,6 +138,11 @@ resource "azurerm_ssh_public_key" "bastion" {
 ###############################################################################
 data "template_file" "nginx-vm-cloud-init" {
   template = file("install-nginx.sh")
+}
+
+resource "tls_private_key" "nginx" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 resource "azurerm_linux_virtual_machine" "nginx_vm" {
   name                  = "nginx-vm"
@@ -218,8 +226,7 @@ resource "azurerm_network_interface_security_group_association" "nginx_nic_sga" 
 resource "azurerm_ssh_public_key" "app" {
   name                = "app_key"
   location            = azurerm_resource_group.test.location
-  resource_group_name = azurerm_resource_group.test.name
-  generate_key        = true
+  public_key          = tls_private_key.nginx.public_key_openssh
 }
 
 ################################################################################

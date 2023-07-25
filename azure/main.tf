@@ -64,7 +64,7 @@ resource "azurerm_linux_virtual_machine" "bastion_vm" {
 
   admin_ssh_key {
    username = "azureuser"
-   public_key = data.azurerm_ssh_public_key.bastion.id
+   public_key = tls_private_key.bastion.public_key_openssh
 
 }
 
@@ -90,9 +90,9 @@ resource "azurerm_public_ip" "bastion_public_ip" {
 }
 
 resource "azurerm_network_interface" "bastion_nic" {
-  name                      = "bastion-nic"
-  location            = azurerm_resource_group.test.location
-  resource_group_name = azurerm_resource_group.test.name
+  name                          = "bastion-nic"
+  location                      = azurerm_resource_group.test.location
+  resource_group_name           = azurerm_resource_group.test.name
   enable_accelerated_networking = true
 
   ip_configuration {
@@ -187,7 +187,7 @@ resource "azurerm_network_interface" "nginx_nic" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.app_subnet.id
+    subnet_id                     = azurerm_subnet.app.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id = azurerm_public_ip.app_public_ip.id
   }
@@ -226,6 +226,7 @@ resource "azurerm_network_interface_security_group_association" "nginx_nic_sga" 
 resource "azurerm_ssh_public_key" "app" {
   name                = "app_key"
   location            = azurerm_resource_group.test.location
+  resource_group      = azurerm_resource_group.test.name
   public_key          = tls_private_key.nginx.public_key_openssh
 }
 

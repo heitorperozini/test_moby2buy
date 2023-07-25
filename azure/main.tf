@@ -62,6 +62,7 @@ resource "azurerm_linux_virtual_machine" "bastion_vm" {
   admin_ssh_key {
    username = "azureuser"
    public_key = data.azurerm_ssh_public_key.bastion.id
+
 }
 
   os_disk {
@@ -80,7 +81,7 @@ resource "azurerm_public_ip" "bastion_public_ip" {
   name                = "bastion-public-ip"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
-  domain_name_label   = "bastion.cloudapp.azure.com"
+  domain_name_label   = "bastion"
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -164,7 +165,7 @@ resource "azurerm_public_ip" "app_public_ip" {
   name                = "app-public-ip"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
-  domain_name_label   = "app.cloudapp.azure.com"
+  domain_name_label   = "app"
   allocation_method   = "Static"
   sku                 = "Standard"
 }
@@ -217,6 +218,7 @@ resource "azurerm_ssh_public_key" "app" {
   name                = "app_key"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
+  public_key          = file("~/.ssh/id_rsa.pub")
 }
 
 ################################################################################
@@ -224,7 +226,7 @@ resource "azurerm_ssh_public_key" "app" {
 ###############################################################################
 
 resource "azurerm_container_registry" "acr" {
-  name                = "test-container-registry"
+  name                = "testcontainerregistry"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
   sku                 = "Basic"

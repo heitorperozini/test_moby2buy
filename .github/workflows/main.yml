@@ -56,9 +56,9 @@ jobs:
 
     - name: Show EC2 IPs and Keys
       run: |
-          echo "EC2 Host IP: $PROD_EC2_HOST"
-          echo "Bastion Host IP: $PROD_BASTION_HOST"
-          echo "Private Key: $PRIVATE_KEY"
+          echo "EC2 Host IP: $APP_HOST"
+          echo "Bastion Host IP: $BASTION_HOST"
+          echo "Private Key: $PUBLIC_KEY"
     - name: Deploy container to EC2
       uses: appleboy/ssh-action@master
       env:

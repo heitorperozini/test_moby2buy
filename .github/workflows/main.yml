@@ -1,0 +1,77 @@
+name: Deploy to ECR
+
+on:
+ 
+  push:
+    branches:
+      - main
+
+jobs:
+  
+  build:
+    
+    name: Build Image
+    runs-on: ubuntu-latest
+
+   
+    steps:
+
+    - name: Check out code
+      uses: actions/checkout@v2
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: test-mobi2buy
+        IMAGE_TAG: nginx:latest
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        
+    - name: Get EC2 Instance IPs
+      id: get-ec2-ips
+      run: |
+          APP_HOST=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=Test-web-server" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+          BASTION_HOST=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=Test-bastion-server" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+          echo "APP_HOST=${APP_HOST}" >> $GITHUB_ENV
+          echo "BASTION_HOST=${BASTION_HOST}" >> $GITHUB_ENV
+
+    - name: Get Private Key from AWS Secrets Manager
+      run: |
+          PRIVATE_KEY=$(aws secretsmanager get-secret-value --secret-id test_key --query 'SecretString' --output text)
+          echo "PRIVATE_KEY=${PRIVATE_KEY}" >> $GITHUB_ENV
+        
+    - name: Deploy container to EC2
+      uses: appleboy/ssh-action@master
+      env:
+        EC2_HOST: ${{ env.APP_HOST }}
+        EC2_USER: ${{ secrets.EC2_USER }}
+        PEM_PATH: ${{ secrets.PEM_PATH }}
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      with:
+        host: ${{ env.BASTION_HOST }}
+        username: ec2-user
+        key: ${{ emv.PRIVATE_KEY }}
+        envs: EC2_HOST, EC2_USER, PEM_PATH, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+       
+        script: |
+          # Comandos a serem executados na instância EC2
+            ssh -i /home/ec2-user/.ssh/test_key.pem ec2-user@$APP_HOST aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID && aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY && aws configure set default.region us-east-1
+            ssh -i /home/ec2-user/.ssh/test_key.pem ec2-user@$APP_HOST aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 767243821043.dkr.ecr.us-east-1.amazonaws.com
+            ssh -i /home/ec2-user/.ssh/test_key.pem ec2-user@$APP_HOST sudo docker pull 767243821043.dkr.ecr.us-east-1.amazonaws.com/nnginx:latest
+            ssh -i /home/ec2-user/.ssh/test_key.pem ec2-user@$APP_HOST sudo docker stop nginx
+            ssh -i /home/ec2-user/.ssh/test_key.pem ec2-user@$APP_HOST  sudo docker rm nginx
+            ssh -i /home/ec2-user/.ssh/test_key.pem ec2-user@$APP_HOST sudo docker run --name mynginx -p 80:80 -d nginx:latest
+            

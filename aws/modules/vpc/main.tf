@@ -92,7 +92,7 @@ resource "aws_nat_gateway" "gw" {
     var.tags,
   )
     depends_on = [aws_subnet.public]
-}
+} 
 
 resource "aws_route_table" "private" {
   count = length(var.private_subnets)

@@ -47,10 +47,12 @@ jobs:
           echo "APP_HOST=${APP_HOST}" >> $GITHUB_ENV
           echo "BASTION_HOST=${BASTION_HOST}" >> $GITHUB_ENV
 
-    - name: Get Private Key from AWS Secrets Manager
+    - name: Get EC2 Key Pair Public Key
+      id: get-ec2-keypair-public-key
       run: |
-          PRIVATE_KEY=$(aws secretsmanager get-secret-value --secret-id test_key --query 'SecretString' --output text)
-          echo "PRIVATE_KEY=${PRIVATE_KEY}" >> $GITHUB_ENV
+          KEY_NAME="test_key"
+          PUBLIC_KEY=$(aws ec2 describe-key-pairs --key-names $KEY_NAME --query 'KeyPairs[0].KeyMaterial' --output text)
+          echo "PUBLIC_KEY=${PUBLIC_KEY}" >> $GITHUB_ENV
         
     - name: Deploy container to EC2
       uses: appleboy/ssh-action@master
@@ -63,7 +65,7 @@ jobs:
       with:
         host: ${{ env.BASTION_HOST }}
         username: ec2-user
-        key: ${{ env.PRIVATE_KEY }}
+        key: ${{ env.PUBLIC_KEY }}
         envs: EC2_HOST, EC2_USER, PEM_PATH, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
        
         script: |

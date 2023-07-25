@@ -127,6 +127,7 @@ resource "azurerm_ssh_public_key" "bastion" {
   name                = "bastion_key"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
+  generate_key        = true
 }
 
 ################################################################################
@@ -218,7 +219,7 @@ resource "azurerm_ssh_public_key" "app" {
   name                = "app_key"
   location            = azurerm_resource_group.test.location
   resource_group_name = azurerm_resource_group.test.name
-  public_key          = file("~/.ssh/id_rsa.pub")
+  generate_key        = true
 }
 
 ################################################################################

@@ -155,7 +155,7 @@ resource "azurerm_linux_virtual_machine" "nginx_vm" {
 
   admin_ssh_key {
    username = "azureuser"
-   public_key = data.azurerm_ssh_public_key.app.id
+   public_key = tls_private_key.nginx.public_key_openssh
 }
 
   os_disk {
@@ -207,6 +207,7 @@ resource "azurerm_network_security_group" "nsg_nginx" {
 
 resource "azurerm_network_security_rule" "nsg_app_ssh" {
   name                        = "allow-ssh"
+  resource_group_name = azurerm_resource_group.test.name
   priority                    = 1001
   direction                   = "Inbound"
   access                      = "Allow"
@@ -224,10 +225,10 @@ resource "azurerm_network_interface_security_group_association" "nginx_nic_sga" 
 }
 
 resource "azurerm_ssh_public_key" "app" {
-  name                = "app_key"
-  location            = azurerm_resource_group.test.location
-  resource_group      = azurerm_resource_group.test.name
-  public_key          = tls_private_key.nginx.public_key_openssh
+  name                  = "app_key"
+  location              = azurerm_resource_group.test.location
+  resource_group_name   = azurerm_resource_group.test.name
+  public_key            = tls_private_key.nginx.public_key_openssh
 }
 
 ################################################################################
